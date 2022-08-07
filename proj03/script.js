@@ -50,8 +50,36 @@ class Enemy {
     }
 }
 
-for (let i = 0; i < numEnemies; i++) {
-    enemies.push(new Enemy());
+class Enemy1 extends Enemy {
+    constructor() {
+        super();
+
+        this.image.src = '../assets/enemy1.png';
+        this.spriteWidth = 293;
+        this.spriteHeight = 155;
+        this.width = this.spriteWidth / 2.5;
+        this.height = this.spriteHeight / 2.5;
+    }
+}
+
+class Enemy2 extends Enemy {
+    constructor() {
+        super();
+
+        this.image.src = '../assets/enemy2.png';
+        this.spriteWidth = 266;
+        this.spriteHeight = 188;
+        this.width = this.spriteWidth / 2.5;
+        this.height = this.spriteHeight / 2.5;
+    }
+}
+
+for (let i = 0; i < numEnemies / 2; i++) {
+    enemies.push(new Enemy1());
+}
+
+for (let i = 0; i < numEnemies / 2; i++) {
+    enemies.push(new Enemy2());
 }
 
 const animate = () => {
