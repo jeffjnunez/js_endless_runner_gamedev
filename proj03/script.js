@@ -27,11 +27,12 @@ class Enemy {
     update() {
         this.x += Math.random() * 5 - 2.5;
         this.y += Math.random() * 5 - 2.5;
+    }
 
+    updateAnim() {
         if (gameFrame % this.flapSpeed === 0) {
             this.frame > this.numFrames - 2 ? this.frame = 0 : this.frame++;
         }
-
     }
 
     draw() {
@@ -88,10 +89,6 @@ class Enemy2 extends Enemy {
         if (this.x + this.width < 0) {
             this.x = canvas.width;
         }
-
-        if (gameFrame % this.flapSpeed === 0) {
-            this.frame > this.numFrames - 2 ? this.frame = 0 : this.frame++;
-        }
     }
 }
 
@@ -125,10 +122,39 @@ class Enemy3 extends Enemy {
         if (this.x + this.width < 0) {
             this.x = canvas.width;
         }
+    }
+}
 
-        if (gameFrame % this.flapSpeed === 0) {
-            this.frame > this.numFrames - 2 ? this.frame = 0 : this.frame++;
+// Moves from randomA to randomB in randomInterval # of frames,
+// then A becomes B and B gets randomized
+class Enemy4 extends Enemy {
+    constructor() {
+        super();
+
+        this.image.src = '../assets/enemy4.png';
+        this.spriteWidth = 213;
+        this.spriteHeight = 212;
+        this.numFrames = 9;
+        this.flapSpeed = 3;
+        this.width = this.spriteWidth / 2;
+        this.height = this.spriteHeight / 2;
+
+        this.newX = Math.random() * (canvas.width - this.width);
+        this.newY = Math.random() * (canvas.height - this.height);
+
+        this.interval = Math.floor(Math.random() * 200 + 50);
+    }
+
+    update() {
+        if (gameFrame % this.interval === 0) {
+            this.newX = Math.random() * (canvas.width - this.width);
+            this.newY = Math.random() * (canvas.height - this.height);
         }
+        let dx = this.x - this.newX;
+        let dy = this.y - this.newY;
+        this.x -= dx / 100;
+        this.y -= dy / 100;
+
     }
 }
 
@@ -140,8 +166,8 @@ class Enemy3 extends Enemy {
 //     enemies.push(new Enemy2());
 // }
 
-for (let i = 0; i < numEnemies * 4; i++) {
-    enemies.push(new Enemy3());
+for (let i = 0; i < numEnemies * 2; i++) {
+    enemies.push(new Enemy4());
 }
 
 const animate = () => {
@@ -149,6 +175,7 @@ const animate = () => {
 
     enemies.forEach(enemy => {
         enemy.update();
+        enemy.updateAnim();
         enemy.draw();
     });
     gameFrame++;
@@ -156,4 +183,4 @@ const animate = () => {
     requestAnimationFrame(animate);
 };
 
-// animate();
+animate();
