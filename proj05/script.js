@@ -13,16 +13,25 @@ let ravens = [];
 
 class Raven {
     constructor() {
-        this.width = 100;
-        this.height = 50;
-        this.x = canvas.width;
-        this.y = Math.random() * (canvas.height - this.height);
         this.xSpeed = Math.random() * 5 + 3;
         this.ySpeed = Math.random() * 5 - 2.5;
         this.markedForDeletion = false;
+        this.image = new Image();
+        this.image.src = '../assets/raven.png';
+        this.spriteWidth = 271;
+        this.spriteHeight = 194;
+        this.sizeModifier = Math.random() * 0.6 + 0.4;
+        this.width = this.spriteWidth * this.sizeModifier;
+        this.height = this.spriteHeight * this.sizeModifier;
+        this.frame = 0;
+        this.numFrames = 6;
+        this.timeSinceFlap = 0;
+        this.flapInterval = Math.random() * 30 + 70;
+        this.x = canvas.width;
+        this.y = Math.random() * (canvas.height - this.height);
     }
 
-    update() {
+    update(dT) {
         this.x -= this.xSpeed;
 
         if (this.x < 0 - this.width) {
@@ -30,8 +39,32 @@ class Raven {
         }
     }
 
+    updateAnim(dT) {
+        this.timeSinceFlap += dT;
+
+        if (this.timeSinceFlap > this.flapInterval) {
+            this.timeSinceFlap -= this.flapInterval;
+
+            this.frame++;
+            if (this.frame > this.numFrames - 1) {
+                this.frame = 0;
+            }
+        }
+    }
+
     draw() {
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.strokeRect(this.x, this.y, this.width, this.height);
+        ctx.drawImage(
+            this.image,
+            this.frame * this.spriteWidth,
+            0,
+            this.spriteWidth,
+            this.spriteHeight,
+            this.x,
+            this.y,
+            this.width,
+            this.height
+        );
     }
 }
 
@@ -48,7 +81,8 @@ const animate = timestamp => {
     }
 
     ravens.forEach(raven => {
-        raven.update();
+        raven.update(dT);
+        raven.updateAnim(dT);
         raven.draw();
     });
 
@@ -60,4 +94,4 @@ const animate = timestamp => {
     requestAnimationFrame(animate);
 };
 
-// animate(0);
+animate(0);
