@@ -78,6 +78,8 @@ class Raven {
             if (this.frame > this.numFrames - 1) {
                 this.frame = 0;
             }
+
+            particles.push(new Particle(this.x + this.width, this.y + this.height / 2, this.width, this.color));
         }
     }
 
@@ -152,6 +154,48 @@ class Explosion {
     }
 }
 
+let particles = [];
+class Particle {
+    constructor(x, y, size, color) {
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.radius = Math.random() * this.size * 0.1;
+        this.maxRadius = Math.random() * 20 + 35;
+        this.markedForDeletion = false;
+        this.xSpeed = Math.random() + 0.5;
+        this.color = color;
+    }
+
+    update(dT) {
+        // Do nothing (for now)
+    }
+
+    updateAnim(dT) {
+        this.x += this.xSpeed;
+        this.radius += 0.4;
+        if (this.radius > this.maxRadius) {
+            this.markedForDeletion = true;
+        }
+    }
+
+    draw() {
+        ctx.save();
+        ctx.globalAlpha = Math.max(1 - this.radius / this.maxRadius, 0);
+        ctx.beginPath();
+        ctx.fillStyle = this.color;
+        ctx.arc(
+            this.x,
+            this.y,
+            this.radius,
+            0,
+            Math.PI * 2
+        );
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
 const drawScore = () => {
     ctx.fillStyle = 'black';
     ctx.fillText('Score: ' + score, 53, 78); // "drop shadow"
@@ -210,7 +254,7 @@ const animate = timestamp => {
     }
 
     drawScore();
-    [...ravens, ...explosions].forEach(object => {
+    [...particles, ...ravens, ...explosions].forEach(object => {
         object.update(dT);
         object.updateAnim(dT);
         object.draw();
@@ -221,6 +265,7 @@ const animate = timestamp => {
     // Remove all the ravens that are marked for delete.
     ravens = ravens.filter(raven => !raven.markedForDeletion);
     explosions = explosions.filter(explosion => !explosion.markedForDeletion);
+    particles = particles.filter(particle => !particle.markedForDeletion);
 
     if (!gameOver) {
         requestAnimationFrame(animate);
