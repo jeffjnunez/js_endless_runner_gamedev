@@ -17,9 +17,10 @@ window.addEventListener('load', () => {
             this.width = width;
             this.height = height;
             this.enemies = [];
-            this.#addNewEnemy();
-            this.enemyInterval = 800;
+            this.enemyInterval = 100;
             this.enemyTimer = 0;
+            this.enemyTypes = ['worm', 'ghost'];
+            this.#addNewEnemy();
         }
 
         update(dT) {
@@ -27,8 +28,6 @@ window.addEventListener('load', () => {
             if (this.enemyTimer > this.enemyInterval) {
                 this.enemyTimer -= this.enemyInterval;
                 this.#addNewEnemy();
-                // console.log(this.enemies);
-                this.enemies = this.enemies.filter(object => !object.markedForDeletion);
             }
 
             this.enemies.forEach(enemy => enemy.update(dT));
@@ -39,7 +38,19 @@ window.addEventListener('load', () => {
         }
 
         #addNewEnemy() {
-            this.enemies.push(new Worm(this));
+            const randomEnemyType = this.enemyTypes[Math.floor(Math.random() * this.enemyTypes.length)];
+            switch (randomEnemyType) {
+                case 'worm':
+                    this.enemies.push(new Worm(this));
+                    break;
+                case 'ghost':
+                    this.enemies.push(new Ghost(this));
+                    break;
+                default:
+                    break;
+            }
+            this.enemies = this.enemies.filter(object => !object.markedForDeletion);
+            this.enemies.sort((a, b) => a.y - b.y);
         }
     }
 
@@ -50,7 +61,7 @@ window.addEventListener('load', () => {
         }
 
         update(dT) {
-            this.x--;
+            this.x -= this.xSpeed * dT;
 
             if (this.x < 0 - this.width) {
                 this.markedForDeletion = true;
@@ -97,6 +108,26 @@ window.addEventListener('load', () => {
             this.height = this.spriteHeight * 0.5;
             this.x = this.game.width;
             this.y = Math.random() * (this.game.height - this.height);
+            this.xSpeed = Math.random() * 0.1 + 0.1;
+        }
+    }
+
+    class Ghost extends Enemy {
+        constructor(game) {
+            super(game);
+
+            this.image = ghost;
+            this.frame = 0;
+            this.numFrames = 6;
+            this.frameInterval = 100;
+            this.frameTimer = 0;
+            this.spriteWidth = 261;
+            this.spriteHeight = 209;
+            this.width = this.spriteWidth * 0.5;
+            this.height = this.spriteHeight * 0.5;
+            this.x = this.game.width;
+            this.y = Math.random() * (this.game.height - this.height);
+            this.xSpeed = Math.random() * 0.2 + 0.1;
         }
     }
 
