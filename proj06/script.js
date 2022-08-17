@@ -19,7 +19,7 @@ window.addEventListener('load', () => {
             this.enemies = [];
             this.enemyInterval = 400;
             this.enemyTimer = 0;
-            this.enemyTypes = ['worm', 'ghost'];
+            this.enemyTypes = ['worm', 'ghost', 'spider'];
             this.#addNewEnemy();
         }
 
@@ -46,6 +46,9 @@ window.addEventListener('load', () => {
                 case 'ghost':
                     this.enemies.push(new Ghost(this));
                     break;
+                case 'spider':
+                    this.enemies.push(new Spider(this));
+                    break;
                 default:
                     break;
             }
@@ -59,6 +62,10 @@ window.addEventListener('load', () => {
     class Enemy {
         constructor(game) {
             this.game = game;
+            this.frame = 0;
+            this.numFrames = 6;
+            this.frameInterval = 100;
+            this.frameTimer = 0;
             this.markedForDeletion = false;
         }
 
@@ -100,10 +107,6 @@ window.addEventListener('load', () => {
             super(game);
 
             this.image = worm;
-            this.frame = 0;
-            this.numFrames = 6;
-            this.frameInterval = 100;
-            this.frameTimer = 0;
             this.spriteWidth = 229;
             this.spriteHeight = 171;
             this.width = this.spriteWidth * 0.5;
@@ -119,10 +122,6 @@ window.addEventListener('load', () => {
             super(game);
 
             this.image = ghost;
-            this.frame = 0;
-            this.numFrames = 6;
-            this.frameInterval = 100;
-            this.frameTimer = 0;
             this.spriteWidth = 261;
             this.spriteHeight = 209;
             this.width = this.spriteWidth * 0.5;
@@ -152,6 +151,47 @@ window.addEventListener('load', () => {
         }
     }
 
+    class Spider extends Enemy {
+        constructor(game) {
+            super(game);
+
+            this.image = spider;
+            this.spriteWidth = 310;
+            this.spriteHeight = 175;
+            this.width = this.spriteWidth * 0.4;
+            this.height = this.spriteHeight * 0.4;
+            this.x = Math.random() * (this.game.width - this.width);
+            this.y = 0 - this.height;
+            this.xSpeed = 0;
+            this.ySpeed = Math.random() * 0.04 + 0.08;
+            this.maxY = Math.random() * (this.game.height - 400) + 200;
+        }
+
+        update(dT) {
+            super.update(dT);
+
+            this.y += this.ySpeed * dT;
+
+            if (this.y > this.maxY) {
+                this.ySpeed *= -1;
+            }
+
+            if (this.ySpeed < 0 && this.y < 0 - this.height) {
+                this.markedForDeletion = true;
+            }
+        }
+
+        draw() {
+
+            ctx.beginPath();
+            ctx.moveTo(this.x + (this.width / 2), 0);
+            ctx.lineTo(this.x + (this.width / 2), this.y + 10);
+            ctx.stroke();
+
+            super.draw();
+        }
+    }
+
     let lastTimestamp = 0;
     const animate = (timestamp) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -166,5 +206,5 @@ window.addEventListener('load', () => {
     };
 
     const game = new Game(ctx, canvas.width, canvas.height);
-    animate(0);
+    // animate(0);
 });
