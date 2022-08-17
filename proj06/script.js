@@ -17,7 +17,7 @@ window.addEventListener('load', () => {
             this.width = width;
             this.height = height;
             this.enemies = [];
-            this.enemyInterval = 100;
+            this.enemyInterval = 400;
             this.enemyTimer = 0;
             this.enemyTypes = ['worm', 'ghost'];
             this.#addNewEnemy();
@@ -50,7 +50,9 @@ window.addEventListener('load', () => {
                     break;
             }
             this.enemies = this.enemies.filter(object => !object.markedForDeletion);
-            this.enemies.sort((a, b) => a.y - b.y);
+            // Worms are aligned on y and ghosts are semi-transparent, so
+            // this sorting is no longer required.
+            // this.enemies.sort((a, b) => a.y - b.y);
         }
     }
 
@@ -79,7 +81,7 @@ window.addEventListener('load', () => {
         }
 
         draw() {
-            ctx.drawImage(
+            this.game.ctx.drawImage(
                 this.image,
                 this.frame * this.spriteWidth,
                 0,
@@ -107,7 +109,7 @@ window.addEventListener('load', () => {
             this.width = this.spriteWidth * 0.5;
             this.height = this.spriteHeight * 0.5;
             this.x = this.game.width;
-            this.y = Math.random() * (this.game.height - this.height);
+            this.y = this.game.height - this.height;
             this.xSpeed = Math.random() * 0.1 + 0.1;
         }
     }
@@ -126,8 +128,27 @@ window.addEventListener('load', () => {
             this.width = this.spriteWidth * 0.5;
             this.height = this.spriteHeight * 0.5;
             this.x = this.game.width;
-            this.y = Math.random() * (this.game.height - this.height);
+            this.y = Math.random() * (this.game.height * 0.6);
             this.xSpeed = Math.random() * 0.2 + 0.1;
+            this.angle = Math.random() * Math.PI;
+            this.angleSpeedMult = Math.random() * 0.003 + 0.003;
+            this.amplitudeMult = Math.random() * 0.5 + 0.75;
+        }
+
+        update(dT) {
+            super.update(dT);
+
+            this.y += Math.sin(this.angle) * this.amplitudeMult;
+            this.angle += dT * this.angleSpeedMult;
+        }
+
+        draw() {
+            this.game.ctx.save();
+            this.game.ctx.globalAlpha = 0.7;
+
+            super.draw();
+
+            this.game.ctx.restore();
         }
     }
 
@@ -145,5 +166,5 @@ window.addEventListener('load', () => {
     };
 
     const game = new Game(ctx, canvas.width, canvas.height);
-    // animate(0);
+    animate(0);
 });
