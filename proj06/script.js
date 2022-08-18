@@ -6,11 +6,6 @@ window.addEventListener('load', () => {
     canvas.width = 500;
     canvas.height = 800;
 
-    console.log(canvas.width, canvas.height);
-
-    ctx.font = '40px Impact';
-
-
     class Game {
         constructor(ctx, width, height) {
             this.ctx = ctx;
