@@ -50,11 +50,20 @@ window.addEventListener('load', () => {
             this.ySpeed = 0.0;
             this.weight = 0.5; // for vertical movement, gravity
             this.xFrame = 0;
-            this.yFrame = 0;
             this.numFrames = 9;
             this.frameInterval = 60;
             this.frameTime = 0;
-            console.log(this.image);
+            this.anims = {
+                run: {
+                    numFrames: 9,
+                    spriteIdxY: 0,
+                },
+                jump: {
+                    numFrames: 6,
+                    spriteIdxY: 1,
+                },
+            };
+            this.currAnim = 'run';
         }
 
         update(dT, input) {
@@ -84,9 +93,13 @@ window.addEventListener('load', () => {
             else {
                 if (input.keys.includes('ArrowUp') && !input.keys.includes('ArrowDown')) {
                     this.ySpeed = -20.0;
+                    this.currAnim = 'jump';
+                    this.frame = 0;
                 }
                 else {
                     this.ySpeed = 0.0;
+                    this.currAnim = 'run';
+                    this.frame = 0;
                 }
             }
             this.y += this.ySpeed;
@@ -103,7 +116,7 @@ window.addEventListener('load', () => {
                 this.frameTime -= this.frameInterval;
 
                 this.xFrame++;
-                if (this.xFrame > this.numFrames - 1) {
+                if (this.xFrame > this.anims[this.currAnim].numFrames - 1) {
                     this.xFrame = 0;
                 }
             }
@@ -116,7 +129,7 @@ window.addEventListener('load', () => {
             context.drawImage(
                 this.image,
                 this.xFrame * this.spriteWidth,
-                this.yFrame * this.spriteHeight,
+                this.anims[this.currAnim].spriteIdxY * this.spriteHeight,
                 this.spriteWidth,
                 this.spriteHeight,
                 this.x,
@@ -162,7 +175,7 @@ window.addEventListener('load', () => {
 
     const input = new InputHandler();
     const player = new Player(canvas.width, canvas.height);
-    // animate(0);
+    animate(0);
 
 
 });
