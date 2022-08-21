@@ -44,39 +44,79 @@ window.addEventListener('load', () => {
             this.spriteHeight = 200;
             this.width = this.spriteWidth;
             this.height = this.spriteHeight;
-            this.x = 10;
-            this.y = this.gameHeight - this.height - 15;
-            this.xSpeed = 0.2;
-            this.frame = 0;
+            this.x = 0;
+            this.y = this.gameHeight - this.height;
+            this.xSpeed = 0.0; //0.2;
+            this.ySpeed = 0.0;
+            this.weight = 0.5; // for vertical movement, gravity
+            this.xFrame = 0;
+            this.yFrame = 0;
             this.numFrames = 9;
             this.frameInterval = 60;
             this.frameTime = 0;
-            this.row = 0;
             console.log(this.image);
         }
 
-        update(dT) {
+        update(dT, input) {
+            // horizontal movement
+            if (input.keys.includes('ArrowRight') && !input.keys.includes('ArrowLeft')) {
+                this.xSpeed = 0.8;
+            }
+            else if (input.keys.includes('ArrowLeft') && !input.keys.includes('ArrowRight')) {
+                this.xSpeed = -0.8;
+            }
+            else {
+                this.xSpeed = 0.0;
+            }
             this.x += this.xSpeed * dT;
+            // bound horizontal movement to the game canvas
+            if (this.x < 0) {
+                this.x = 0;
+            }
+            else if (this.x > this.gameWidth - this.width) {
+                this.x = this.gameWidth - this.width;
+            }
+
+            // vertical movement
+            if (!this.onGround()) {
+                this.ySpeed += this.weight;
+            }
+            else {
+                if (input.keys.includes('ArrowUp') && !input.keys.includes('ArrowDown')) {
+                    this.ySpeed = -20.0;
+                }
+                else {
+                    this.ySpeed = 0.0;
+                }
+            }
+            this.y += this.ySpeed;
+            // bound vertical movement to the game canvas
+            if (this.y > this.gameHeight - this.height) {
+                this.y = this.gameHeight - this.height;
+            }
+            // else if (this.x > this.gameWidth - this.width) {
+            //     this.x = this.gameWidth - this.width;
+            // }
 
             this.frameTime += dT;
             if (this.frameTime > this.frameInterval) {
                 this.frameTime -= this.frameInterval;
 
-                this.frame++;
-                if (this.frame > this.numFrames - 1) {
-                    this.frame = 0;
+                this.xFrame++;
+                if (this.xFrame > this.numFrames - 1) {
+                    this.xFrame = 0;
                 }
             }
         }
 
         draw(context) {
-            // context.fillStyle = 'white';
-            // context.fillRect(this.x, this.y, this.width, this.height);
+            context.fillStyle = 'white';
+            context.fillRect(this.x, this.y, this.width, this.height);
 
             context.drawImage(
                 this.image,
-                this.frame * this.spriteWidth,
-                this.row * this.spriteHeight,
+                this.xFrame * this.spriteWidth,
+                this.yFrame * this.spriteHeight,
                 this.spriteWidth,
                 this.spriteHeight,
                 this.x,
@@ -84,6 +124,10 @@ window.addEventListener('load', () => {
                 this.width,
                 this.height
             );
+        }
+
+        onGround() {
+            return this.y >= this.gameHeight - this.height;
         }
     }
 
@@ -111,7 +155,7 @@ window.addEventListener('load', () => {
         lastTimestamp = timestamp;
     //     // some code
 
-        player.update(dT);
+        player.update(dT, input);
         player.draw(ctx);
         requestAnimationFrame(animate);
     };
