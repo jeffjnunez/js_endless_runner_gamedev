@@ -145,11 +145,80 @@ window.addEventListener('load', () => {
     }
 
     class Background {
+        constructor(gameWidth, gameHeight) {
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.image = document.getElementById('backgroundImage');
+            this.x = 0;
+            this.y = 0;
+            this.width = 2400;
+            this.height = 720;
+            this.xSpeed = 0.3;
+            this.latestXOffset = 0; // for endless scrolling
+        }
 
+        draw(context) {
+            context.drawImage(
+                this.image,
+                this.x,
+                this.y,
+                this.width,
+                this.height
+            );
+
+            context.drawImage(
+                this.image,
+                this.x + this.width - this.latestXOffset,
+                this.y,
+                this.width,
+                this.height
+            );
+        }
+
+        update(dT) {
+            this.latestXOffset = this.xSpeed * dT;
+            this.x -= this.latestXOffset;
+
+            if (this.x < 0 - this.width) {
+                this.x = 0;
+            }
+        }
     }
 
     class Enemy {
+        constructor(gameWidth, gameHeight) {
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.image = document.getElementById('enemyImage');
+            this.width = 160;
+            this.height = 119;
+            this.spriteWidth = this.width;
+            this.spriteHeight = this.height;
+            this.x = this.gameWidth;
+            this.y = this.gameHeight - this.height;
+            this.xFrame = 0;
+            this.xSpeed = 0.2;
+        }
 
+        update(dT) {
+            this.x -= this.xSpeed * dT;
+        }
+
+        draw(context) {
+            context.drawImage(
+                this.image,
+                this.xFrame * this.spriteWidth,
+                0,
+                this.spriteWidth,
+                this.spriteHeight,
+                this.x,
+                this.y,
+                this.width,
+                this.height
+            );
+
+
+        }
     }
 
     const handleEnemies = () => {
@@ -166,15 +235,20 @@ window.addEventListener('load', () => {
 
         const dT = timestamp - lastTimestamp;
         lastTimestamp = timestamp;
-    //     // some code
 
+        background.update(dT);
+        background.draw(ctx);
         player.update(dT, input);
         player.draw(ctx);
+        enemy1.update(dT);
+        enemy1.draw(ctx);
         requestAnimationFrame(animate);
     };
 
     const input = new InputHandler();
     const player = new Player(canvas.width, canvas.height);
+    const background = new Background(canvas.width, canvas.height);
+    const enemy1 = new Enemy(canvas.width, canvas.height);
     animate(0);
 
 
