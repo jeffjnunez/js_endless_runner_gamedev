@@ -7,6 +7,7 @@ window.addEventListener('load', () => {
     canvas.height = 720;
 
     let enemies = [];
+    let score = 0;
 
     ctx.font = '40px Impact';
 
@@ -68,6 +69,7 @@ window.addEventListener('load', () => {
                 },
             };
             this.currAnim = 'run';
+            this.circleHitboxAdjustment = 6; // value to shrink hitbox by, for better gameplay feel
         }
 
         update(dT, input) {
@@ -129,8 +131,17 @@ window.addEventListener('load', () => {
         }
 
         draw(context) {
-            // context.fillStyle = 'white';
-            // context.fillRect(this.x, this.y, this.width, this.height);
+            context.strokeStyle = 'white';
+            context.strokeRect(this.x, this.y, this.width, this.height);
+            context.beginPath();
+            context.arc(
+                this.x + this.width / 2,
+                this.y + this.height / 2 + this.circleHitboxAdjustment,
+                this.width / 2 - this.circleHitboxAdjustment,
+                0,
+                Math.PI * 2
+            );
+            context.stroke();
 
             context.drawImage(
                 this.image,
@@ -208,13 +219,15 @@ window.addEventListener('load', () => {
             this.fps = 10;
             this.frameInterval = 1000 / this.fps;
             this.frameTime = 0;
+            this.circleHitboxAdjustment = 8;
             this.markedForDeletion = false;
         }
 
         update(dT) {
             this.x -= this.xSpeed * dT;
-            if (this.x < 0 - this.width) {
+            if (this.x < 0 - this.width && !this.markedForDeletion) {
                 this.markedForDeletion = true;
+                score++;
             }
 
             this.frameTime += dT;
@@ -229,6 +242,19 @@ window.addEventListener('load', () => {
         }
 
         draw(context) {
+            // collision hitbox for testing
+            context.strokeStyle = 'white';
+            context.strokeRect(this.x, this.y, this.width, this.height);
+            context.beginPath();
+            context.arc(
+                this.x + this.width / 2 - 10, // custom adjustments to better fit the circle to sprite
+                this.y + this.height / 2 + this.circleHitboxAdjustment + 3,
+                this.width / 2 - this.circleHitboxAdjustment,
+                0,
+                Math.PI * 2
+            );
+            context.stroke();
+
             context.drawImage(
                 this.image,
                 this.xFrame * this.spriteWidth,
@@ -266,8 +292,25 @@ window.addEventListener('load', () => {
         });
     };
 
-    const displayStatusText = () => {
+    const displayStatusText = (context) => {
+        // context.font = '40px Helvetica';
+        const xPos = 20;
+        const yPos = 50;
+        const shadowOffset = 3;
 
+        context.fillStyle = 'black';
+        context.fillText(
+            'Score: ' + score,
+            xPos + shadowOffset,
+            yPos + shadowOffset
+        );
+
+        context.fillStyle = 'white';
+        context.fillText(
+            'Score: ' + score,
+            xPos,
+            yPos
+        );
     };
 
     let lastTimestamp = 0;
@@ -282,6 +325,7 @@ window.addEventListener('load', () => {
         player.update(dT, input);
         player.draw(ctx);
         handleEnemies(dT);
+        displayStatusText(ctx);
         requestAnimationFrame(animate);
     };
 
