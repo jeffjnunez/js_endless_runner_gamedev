@@ -6,6 +6,8 @@ window.addEventListener('load', () => {
     canvas.width = 800;
     canvas.height = 720;
 
+    let enemies = [];
+
     ctx.font = '40px Impact';
 
     const keysToRegister = [
@@ -51,7 +53,9 @@ window.addEventListener('load', () => {
             this.weight = 0.5; // for vertical movement, gravity
             this.xFrame = 0;
             this.numFrames = 9;
-            this.frameInterval = 60;
+            this.fps = 16;
+            this.frameInterval = 1000 / this.fps;
+            // this.frameInterval = 60;
             this.frameTime = 0;
             this.anims = {
                 run: {
@@ -107,10 +111,12 @@ window.addEventListener('load', () => {
             if (this.y > this.gameHeight - this.height) {
                 this.y = this.gameHeight - this.height;
             }
+            /* Might not need to limit upper vertical position. */
             // else if (this.x > this.gameWidth - this.width) {
             //     this.x = this.gameWidth - this.width;
             // }
 
+            // sprite animation
             this.frameTime += dT;
             if (this.frameTime > this.frameInterval) {
                 this.frameTime -= this.frameInterval;
@@ -123,8 +129,8 @@ window.addEventListener('load', () => {
         }
 
         draw(context) {
-            context.fillStyle = 'white';
-            context.fillRect(this.x, this.y, this.width, this.height);
+            // context.fillStyle = 'white';
+            // context.fillRect(this.x, this.y, this.width, this.height);
 
             context.drawImage(
                 this.image,
@@ -196,12 +202,30 @@ window.addEventListener('load', () => {
             this.spriteHeight = this.height;
             this.x = this.gameWidth;
             this.y = this.gameHeight - this.height;
+            this.xSpeed = 0.35;
             this.xFrame = 0;
-            this.xSpeed = 0.2;
+            this.numFrames = 6;
+            this.fps = 10;
+            this.frameInterval = 1000 / this.fps;
+            this.frameTime = 0;
+            this.markedForDeletion = false;
         }
 
         update(dT) {
             this.x -= this.xSpeed * dT;
+            if (this.x < 0 - this.width) {
+                this.markedForDeletion = true;
+            }
+
+            this.frameTime += dT;
+            if (this.frameTime > this.frameInterval) {
+                this.frameTime -= this.frameInterval;
+
+                this.xFrame++;
+                if (this.xFrame > this.numFrames - 1) {
+                    this.xFrame = 0;
+                }
+            }
         }
 
         draw(context) {
@@ -221,13 +245,30 @@ window.addEventListener('load', () => {
         }
     }
 
-    const handleEnemies = () => {
+    const getRandomEnemyInterval = () => {
+        return Math.random() * 1200 + 1000;
+    };
 
-    }
+    let enemyTimer = 0;
+    let enemyInterval = getRandomEnemyInterval();
+    const handleEnemies = dT => {
+        enemyTimer += dT;
+        if (enemyTimer > enemyInterval) {
+            enemyTimer -= enemyInterval;
+            enemyInterval = getRandomEnemyInterval();
+            enemies.push(new Enemy(canvas.width, canvas.height));
+            enemies = enemies.filter(enemy => !enemy.markedForDeletion);
+        }
+
+        enemies.forEach(enemy => {
+            enemy.update(dT);
+            enemy.draw(ctx);
+        });
+    };
 
     const displayStatusText = () => {
 
-    }
+    };
 
     let lastTimestamp = 0;
     const animate = (timestamp) => {
@@ -236,19 +277,17 @@ window.addEventListener('load', () => {
         const dT = timestamp - lastTimestamp;
         lastTimestamp = timestamp;
 
-        background.update(dT);
+        // background.update(dT);
         background.draw(ctx);
         player.update(dT, input);
         player.draw(ctx);
-        enemy1.update(dT);
-        enemy1.draw(ctx);
+        handleEnemies(dT);
         requestAnimationFrame(animate);
     };
 
     const input = new InputHandler();
     const player = new Player(canvas.width, canvas.height);
     const background = new Background(canvas.width, canvas.height);
-    const enemy1 = new Enemy(canvas.width, canvas.height);
     animate(0);
 
 
