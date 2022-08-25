@@ -8,6 +8,7 @@ window.addEventListener('load', () => {
 
     let enemies = [];
     let score = 0;
+    let gameOver = false;
 
     ctx.font = '40px Impact';
 
@@ -72,7 +73,29 @@ window.addEventListener('load', () => {
             this.circleHitboxAdjustment = 6; // value to shrink hitbox by, for better gameplay feel
         }
 
+        hitboxOriginX() {
+            return this.x + this.width / 2;
+        }
+
+        hitboxOriginY() {
+            return this.y + this.height / 2 + this.circleHitboxAdjustment;
+        }
+
+        hitboxRadius() {
+            return this.width / 2 - this.circleHitboxAdjustment;
+        }
+
         update(dT, input) {
+            // collision detection
+            enemies.forEach(enemy => {
+                const dx = enemy.hitboxOriginX() - this.hitboxOriginX();
+                const dy = enemy.hitboxOriginY() - this.hitboxOriginY();
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < enemy.hitboxRadius() + this.hitboxRadius()) {
+                    gameOver = true;
+                }
+            });
+
             // horizontal movement
             if (input.keys.includes('ArrowRight') && !input.keys.includes('ArrowLeft')) {
                 this.xSpeed = 0.8;
@@ -135,9 +158,9 @@ window.addEventListener('load', () => {
             context.strokeRect(this.x, this.y, this.width, this.height);
             context.beginPath();
             context.arc(
-                this.x + this.width / 2,
-                this.y + this.height / 2 + this.circleHitboxAdjustment,
-                this.width / 2 - this.circleHitboxAdjustment,
+                this.hitboxOriginX(),
+                this.hitboxOriginY(),
+                this.hitboxRadius(),
                 0,
                 Math.PI * 2
             );
@@ -219,8 +242,20 @@ window.addEventListener('load', () => {
             this.fps = 10;
             this.frameInterval = 1000 / this.fps;
             this.frameTime = 0;
-            this.circleHitboxAdjustment = 8;
             this.markedForDeletion = false;
+            this.circleHitboxAdjustment = 8;
+        }
+
+        hitboxOriginX() {
+            return this.x + this.width / 2 - 10; // custom adjustments to better fit the circle to sprite
+        }
+
+        hitboxOriginY() {
+            return this.y + this.height / 2 + this.circleHitboxAdjustment + 3;
+        }
+
+        hitboxRadius() {
+            return this.width / 2 - this.circleHitboxAdjustment;
         }
 
         update(dT) {
@@ -247,9 +282,9 @@ window.addEventListener('load', () => {
             context.strokeRect(this.x, this.y, this.width, this.height);
             context.beginPath();
             context.arc(
-                this.x + this.width / 2 - 10, // custom adjustments to better fit the circle to sprite
-                this.y + this.height / 2 + this.circleHitboxAdjustment + 3,
-                this.width / 2 - this.circleHitboxAdjustment,
+                this.hitboxOriginX(),
+                this.hitboxOriginY(),
+                this.hitboxRadius(),
                 0,
                 Math.PI * 2
             );
@@ -311,6 +346,19 @@ window.addEventListener('load', () => {
             xPos,
             yPos
         );
+
+        if (gameOver) {
+            context.textAlign = 'center';
+            context.font = '90px Impact';
+            context.fillStyle = 'white';
+            // fake an 'outline' around the text
+            context.fillText('GAME OVER', canvas.width / 2 + shadowOffset, canvas.height / 2 + shadowOffset);
+            context.fillText('GAME OVER', canvas.width / 2 + shadowOffset, canvas.height / 2 - shadowOffset);
+            context.fillText('GAME OVER', canvas.width / 2 - shadowOffset, canvas.height / 2 + shadowOffset);
+            context.fillText('GAME OVER', canvas.width / 2 - shadowOffset, canvas.height / 2 - shadowOffset);
+            context.fillStyle = 'black';
+            context.fillText('GAME OVER', canvas.width / 2, canvas.height / 2);
+        }
     };
 
     let lastTimestamp = 0;
@@ -326,7 +374,9 @@ window.addEventListener('load', () => {
         player.draw(ctx);
         handleEnemies(dT);
         displayStatusText(ctx);
-        requestAnimationFrame(animate);
+        if (!gameOver) {
+            requestAnimationFrame(animate);
+        }
     };
 
     const input = new InputHandler();
