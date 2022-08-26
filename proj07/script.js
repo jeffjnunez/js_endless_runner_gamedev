@@ -9,6 +9,7 @@ window.addEventListener('load', () => {
     let enemies = [];
     let score = 0;
     let gameOver = false;
+    let restartTriggered = false; // Used to end the current anim loop before restarting game.
 
     ctx.font = '40px Impact';
 
@@ -19,16 +20,29 @@ window.addEventListener('load', () => {
         'ArrowRight',
     ];
 
+    const resetKeys = [
+        'r',
+    ];
+
     class InputHandler {
         constructor() {
             this.keys = []; // all keys currently being pressed
 
             window.addEventListener('keydown', e => {
-                if (keysToRegister.includes(e.key) &&
+                if (resetKeys.includes(e.key)) {
+                    if (gameOver) {
+                        restartGame();
+                    }
+                    else {
+                        restartTriggered = true;
+                    }
+                }
+                else if (keysToRegister.includes(e.key) &&
                     this.keys.indexOf(e.key) === -1)
                 {
                     this.keys.push(e.key);
                 }
+                console.log(e.key);
             });
 
             window.addEventListener('keyup', e => {
@@ -48,7 +62,7 @@ window.addEventListener('load', () => {
             this.spriteHeight = 200;
             this.width = this.spriteWidth;
             this.height = this.spriteHeight;
-            this.x = 0;
+            this.x = 100;
             this.y = this.gameHeight - this.height;
             this.xSpeed = 0.0; //0.2;
             this.ySpeed = 0.0;
@@ -83,6 +97,15 @@ window.addEventListener('load', () => {
 
         hitboxRadius() {
             return this.width / 2 - this.circleHitboxAdjustment;
+        }
+
+        restart() {
+            this.x = 100;
+            this.y = this.gameHeight - this.height;
+
+            this.ySpeed = 0.0;
+            this.currAnim = 'run';
+            this.frame = 0;
         }
 
         update(dT, input) {
@@ -195,6 +218,10 @@ window.addEventListener('load', () => {
             this.height = 720;
             this.xSpeed = 0.3;
             this.latestXOffset = 0; // for endless scrolling
+        }
+
+        restart() {
+            this.x = 0;
         }
 
         draw(context) {
@@ -327,22 +354,26 @@ window.addEventListener('load', () => {
         });
     };
 
-    const displayStatusText = (context) => {
+    const displayStatusText = (context, plyr) => {
+        context.textAlign = 'left';
         // context.font = '40px Helvetica';
+        context.font = '40px Impact';
         const xPos = 20;
         const yPos = 50;
         const shadowOffset = 3;
 
         context.fillStyle = 'black';
         context.fillText(
-            'Score: ' + score,
+            // 'Score: ' + score,
+            'ySpeed: ' + plyr.ySpeed,
             xPos + shadowOffset,
             yPos + shadowOffset
         );
 
         context.fillStyle = 'white';
         context.fillText(
-            'Score: ' + score,
+            // 'Score: ' + score,
+            'ySpeed: ' + plyr.ySpeed,
             xPos,
             yPos
         );
@@ -361,6 +392,16 @@ window.addEventListener('load', () => {
         }
     };
 
+    const restartGame = () => {
+        player.restart();
+        background.restart();
+
+        enemies = [];
+        score = 0;
+        gameOver = false;
+        animate(lastTimestamp);
+    };
+
     let lastTimestamp = 0;
     const animate = (timestamp) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -373,9 +414,13 @@ window.addEventListener('load', () => {
         player.update(dT, input);
         player.draw(ctx);
         handleEnemies(dT);
-        displayStatusText(ctx);
-        if (!gameOver) {
+        displayStatusText(ctx, player);
+        if (!gameOver && !restartTriggered) {
             requestAnimationFrame(animate);
+        }
+        if (restartTriggered) {
+            restartTriggered = false;
+            restartGame();
         }
     };
 
