@@ -109,7 +109,9 @@ window.addEventListener('load', () => {
                 },
             };
             this.currAnim = 'run';
-            this.circleHitboxAdjustment = 6; // value to shrink hitbox by, for better gameplay feel
+            // values to shrink/move hitbox by, for better gameplay feel
+            this.circleHitboxAdjustmentY = 14;
+            this.circleHitboxRadiusAdjustment = -18;
         }
 
         hitboxOriginX() {
@@ -117,11 +119,11 @@ window.addEventListener('load', () => {
         }
 
         hitboxOriginY() {
-            return this.y + this.height / 2 + this.circleHitboxAdjustment;
+            return this.y + this.height / 2 + this.circleHitboxAdjustmentY;
         }
 
         hitboxRadius() {
-            return this.width / 2 - this.circleHitboxAdjustment;
+            return this.width / 2 + this.circleHitboxRadiusAdjustment;
         }
 
         restart() {
@@ -205,17 +207,7 @@ window.addEventListener('load', () => {
         }
 
         draw(context) {
-            context.strokeStyle = 'white';
-            context.strokeRect(this.x, this.y, this.width, this.height);
-            context.beginPath();
-            context.arc(
-                this.hitboxOriginX(),
-                this.hitboxOriginY(),
-                this.hitboxRadius(),
-                0,
-                Math.PI * 2
-            );
-            context.stroke();
+            // debugDrawHitbox(context, this);
 
             context.drawImage(
                 this.image,
@@ -298,19 +290,22 @@ window.addEventListener('load', () => {
             this.frameInterval = 1000 / this.fps;
             this.frameTime = 0;
             this.markedForDeletion = false;
-            this.circleHitboxAdjustment = 8;
+            // custom adjustments to better fit the circle to sprite
+            this.circleHitboxAdjustmentX = -24;
+            this.circleHitboxAdjustmentY = 8;
+            this.circleHitboxRadiusAdjustment = -24;
         }
 
         hitboxOriginX() {
-            return this.x + this.width / 2 - 10; // custom adjustments to better fit the circle to sprite
+            return this.x + this.width / 2 + this.circleHitboxAdjustmentX;
         }
 
         hitboxOriginY() {
-            return this.y + this.height / 2 + this.circleHitboxAdjustment + 3;
+            return this.y + this.height / 2 + this.circleHitboxAdjustmentY;
         }
 
         hitboxRadius() {
-            return this.width / 2 - this.circleHitboxAdjustment;
+            return this.width / 2 + this.circleHitboxRadiusAdjustment;
         }
 
         update(dT) {
@@ -332,18 +327,7 @@ window.addEventListener('load', () => {
         }
 
         draw(context) {
-            // collision hitbox for testing
-            context.strokeStyle = 'white';
-            context.strokeRect(this.x, this.y, this.width, this.height);
-            context.beginPath();
-            context.arc(
-                this.hitboxOriginX(),
-                this.hitboxOriginY(),
-                this.hitboxRadius(),
-                0,
-                Math.PI * 2
-            );
-            context.stroke();
+            // debugDrawHitbox(context, this);
 
             context.drawImage(
                 this.image,
@@ -389,6 +373,7 @@ window.addEventListener('load', () => {
         const xPos = 20;
         const yPos = 50;
         const shadowOffset = 3;
+        const restartTextOffset = 60;
 
         context.fillStyle = 'black';
         context.fillText(
@@ -415,6 +400,12 @@ window.addEventListener('load', () => {
             context.fillText('GAME OVER', canvas.width / 2 - shadowOffset, canvas.height / 2 - shadowOffset);
             context.fillStyle = 'black';
             context.fillText('GAME OVER', canvas.width / 2, canvas.height / 2);
+
+            context.font = '50px Impact';
+            context.fillText('press R or SwipeDown to restart', canvas.width / 2 + shadowOffset, canvas.height / 2 + shadowOffset + restartTextOffset);
+            context.fillStyle = 'white';
+            context.fillText('press R or SwipeDown to restart', canvas.width / 2, canvas.height / 2 + restartTextOffset);
+
         }
     };
 
@@ -433,6 +424,20 @@ window.addEventListener('load', () => {
         gameOver = true;
         // enemies = [];
     };
+
+    const debugDrawHitbox = (context, entity) => {
+        context.strokeStyle = 'white';
+        context.strokeRect(entity.x, entity.y, entity.width, entity.height);
+        context.beginPath();
+        context.arc(
+            entity.hitboxOriginX(),
+            entity.hitboxOriginY(),
+            entity.hitboxRadius(),
+            0,
+            Math.PI * 2
+        );
+        context.stroke();
+    }
 
     const restartGame = () => {
         player.restart();
