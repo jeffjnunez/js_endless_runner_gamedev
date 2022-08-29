@@ -21,3 +21,12 @@ body {
 #playerImage, #backgroundImage, #enemyImage {
     display: none;
 }
+
+#fullscreenButton {
+    position: absolute;
+    font-size: 20px;
+    padding: 10px;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
