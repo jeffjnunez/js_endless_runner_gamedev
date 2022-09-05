@@ -1,8 +1,9 @@
 import Player from './player.js';
+import InputHandler from './input.js';
 
+import { drawStatusText } from './utils.js';
 
 window.addEventListener('load', () => {
-
     const loading = document.getElementById('loading');
     loading.style.display = 'none';
 
@@ -20,32 +21,38 @@ window.addEventListener('load', () => {
     const animate = (timestamp) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Realign timestamp and lastTimestamp after a reset.
-        // Don't update the game logic this frame, since dT
-        // is not accurate.
-        if (firstAnimFrame) {
-            firstAnimFrame = false;
-            lastTimestamp = timestamp;
-            background.draw(ctx);
-            requestAnimationFrame(animate);
-            return;
-        }
-        const dT = timestamp - lastTimestamp;
-        lastTimestamp = timestamp;
-
-        background.update(dT);
-        background.draw(ctx);
-        player.update(dT, input);
+        player.update(input.lastKey);
         player.draw(ctx);
-        handleEnemies(dT);
-        displayStatusText(ctx, player);
-        if (!gameOver && !restartTriggered) {
-            requestAnimationFrame(animate);
-        }
-        if (restartTriggered) {
-            restartTriggered = false;
-            restartGame();
-        }
+        drawStatusText(ctx, input, player);
+
+        requestAnimationFrame(animate);
+
+        // // Realign timestamp and lastTimestamp after a reset.
+        // // Don't update the game logic this frame, since dT
+        // // is not accurate.
+        // if (firstAnimFrame) {
+        //     firstAnimFrame = false;
+        //     lastTimestamp = timestamp;
+        //     background.draw(ctx);
+        //     requestAnimationFrame(animate);
+        //     return;
+        // }
+        // const dT = timestamp - lastTimestamp;
+        // lastTimestamp = timestamp;
+
+        // background.update(dT);
+        // background.draw(ctx);
+        // player.update(dT, input);
+        // player.draw(ctx);
+        // handleEnemies(dT);
+        // displayStatusText(ctx, player);
+        // if (!gameOver && !restartTriggered) {
+        //     requestAnimationFrame(animate);
+        // }
+        // if (restartTriggered) {
+        //     restartTriggered = false;
+        //     restartGame();
+        // }
     };
 
     // const input = new InputHandler();
@@ -54,5 +61,9 @@ window.addEventListener('load', () => {
     // animate(0);
 
     const player = new Player(canvas.width, canvas.height);
-    player.draw(ctx);
+    player.setState(0);
+    // player.draw(ctx);
+
+    const input = new InputHandler();
+    animate();
 });
