@@ -1,10 +1,20 @@
-import { StandingLeft, StandingRight } from './state.js';
+import {
+    StandingLeft,
+    StandingRight,
+    SittingLeft,
+    SittingRight
+} from './state.js';
 
 class Player {
     constructor(gameWidth, gameHeight) {
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
-        this.states = [new StandingLeft(this), new StandingRight(this)];
+        this.states = [
+            new StandingLeft(this),   // 0
+            new StandingRight(this),  // 1
+            new SittingLeft(this),    // 2
+            new SittingRight(this)    // 3
+        ];
         this.currentState = this.states[0];
         this.image = document.getElementById('dogImage');
         this.imageColumns = 9;
