@@ -61,7 +61,7 @@ window.addEventListener('load', () => {
     // animate(0);
 
     const player = new Player(canvas.width, canvas.height);
-    player.setState(0);
+    player.setState(1);
     // player.draw(ctx);
 
     const input = new InputHandler();

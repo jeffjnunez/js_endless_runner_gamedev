@@ -2,7 +2,9 @@ import {
     StandingLeft,
     StandingRight,
     SittingLeft,
-    SittingRight
+    SittingRight,
+    RunningLeft,
+    RunningRight
 } from './state.js';
 
 class Player {
@@ -13,7 +15,9 @@ class Player {
             new StandingLeft(this),   // 0
             new StandingRight(this),  // 1
             new SittingLeft(this),    // 2
-            new SittingRight(this)    // 3
+            new SittingRight(this),   // 3
+            new RunningLeft(this),    // 4
+            new RunningRight(this),   // 5
         ];
         this.currentState = this.states[0];
         this.image = document.getElementById('dogImage');
@@ -30,6 +34,8 @@ class Player {
         this.height = this.spriteHeight;
         this.x = this.gameWidth / 2 - this.width / 2;
         this.y = this.gameHeight - this.height;
+        this.xSpeed = 0;
+        this.xMaxSpeed = 10;
     }
 
     draw(context) {
@@ -48,6 +54,15 @@ class Player {
 
     update(input) {
         this.currentState.handleInput(input);
+
+        // horizontal movement
+        this.x += this.xSpeed;
+        if (this.x <= 0) {
+            this.x = 0;
+        }
+        else if (this.x >= this.gameWidth - this.width) {
+            this.x = this.gameWidth - this.width;
+        }
     }
 
     setState(state) {

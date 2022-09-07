@@ -3,6 +3,8 @@ export const states = {
     STANDING_RIGHT: 1,
     SITTING_LEFT: 2,
     SITTING_RIGHT: 3,
+    RUNNING_LEFT: 4,
+    RUNNING_RIGHT: 5,
 };
 
 class State {
@@ -21,11 +23,15 @@ export class StandingLeft extends State {
 
     enter() {
         this.player.yFrame = 1;
+        this.player.xSpeed = 0;
     }
 
     handleInput(input) {
-        if (input === 'PRESS right') {
-            this.player.setState(states.STANDING_RIGHT);
+        if (input === 'PRESS left') {
+            this.player.setState(states.RUNNING_LEFT);
+        }
+        else if (input === 'PRESS right') {
+            this.player.setState(states.RUNNING_RIGHT);
         }
         else if (input === 'PRESS down') {
             this.player.setState(states.SITTING_LEFT);
@@ -42,11 +48,15 @@ export class StandingRight extends State {
 
     enter() {
         this.player.yFrame = 0;
+        this.player.xSpeed = 0;
     }
 
     handleInput(input) {
-        if (input === 'PRESS left') {
-            this.player.setState(states.STANDING_LEFT);
+        if (input === 'PRESS right') {
+            this.player.setState(states.RUNNING_RIGHT);
+        }
+        else if (input === 'PRESS left') {
+            this.player.setState(states.RUNNING_LEFT);
         }
         else if (input === 'PRESS down') {
             this.player.setState(states.SITTING_RIGHT);
@@ -63,6 +73,7 @@ export class SittingLeft extends State {
 
     enter() {
         this.player.yFrame = 9;
+        this.player.xSpeed = 0;
     }
 
     handleInput(input) {
@@ -84,6 +95,7 @@ export class SittingRight extends State {
 
     enter() {
         this.player.yFrame = 8;
+        this.player.xSpeed = 0;
     }
 
     handleInput(input) {
@@ -96,5 +108,54 @@ export class SittingRight extends State {
     }
 }
 
+export class RunningLeft extends State {
+    constructor(player) {
+        super('RUNNING_LEFT');
+
+        this.player = player;
+    }
+
+    enter() {
+        this.player.yFrame = 7;
+        this.player.xSpeed = -this.player.xMaxSpeed;
+    }
+
+    handleInput(input) {
+        if (input === 'PRESS right') {
+            this.player.setState(states.RUNNING_RIGHT);
+        }
+        else if (input === 'RELEASE left') {
+            this.player.setState(states.STANDING_LEFT);
+        }
+        else if (input === 'PRESS down') {
+            this.player.setState(states.SITTING_LEFT);
+        }
+    }
+}
+
+export class RunningRight extends State {
+    constructor(player) {
+        super('RUNNING_RIGHT');
+
+        this.player = player;
+    }
+
+    enter() {
+        this.player.yFrame = 6;
+        this.player.xSpeed = this.player.xMaxSpeed;
+    }
+
+    handleInput(input) {
+        if (input === 'PRESS left') {
+            this.player.setState(states.RUNNING_LEFT);
+        }
+        else if (input === 'RELEASE right') {
+            this.player.setState(states.STANDING_RIGHT);
+        }
+        else if (input === 'PRESS down') {
+            this.player.setState(states.SITTING_RIGHT);
+        }
+    }
+}
 
 export default State;
