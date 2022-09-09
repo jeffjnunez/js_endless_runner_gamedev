@@ -4,7 +4,11 @@ import {
     SittingLeft,
     SittingRight,
     RunningLeft,
-    RunningRight
+    RunningRight,
+    JumpingLeft,
+    JumpingRight,
+    FallingLeft,
+    FallingRight
 } from './state.js';
 
 class Player {
@@ -18,6 +22,10 @@ class Player {
             new SittingRight(this),   // 3
             new RunningLeft(this),    // 4
             new RunningRight(this),   // 5
+            new JumpingLeft(this),    // 6
+            new JumpingRight(this),   // 7
+            new FallingLeft(this),    // 8
+            new FallingRight(this),   // 9
         ];
         this.currentState = this.states[0];
         this.image = document.getElementById('dogImage');
@@ -29,13 +37,19 @@ class Player {
         console.log(this.image.height, this.imageRows, this.spriteHeight);
         this.xFrame = 0;
         this.yFrame = 0;
-        this.numFrames = 12;
+        this.numXFrames = 0;
+        this.frameInterval = 60;
+        this.currFrameTime = 0;
         this.width = this.spriteWidth;
         this.height = this.spriteHeight;
         this.x = this.gameWidth / 2 - this.width / 2;
-        this.y = this.gameHeight - this.height;
+        this.startingY = this.gameHeight - this.height;
+        this.y = this.startingY;
         this.xSpeed = 0;
         this.xMaxSpeed = 10;
+        this.ySpeed = 0;
+        this.yJumpImpulse = -20;
+        this.weight = 0.5;
     }
 
     draw(context) {
@@ -52,8 +66,19 @@ class Player {
         );
     }
 
-    update(input) {
+    update(dT, input) {
         this.currentState.handleInput(input);
+
+        // advance current animation
+        this.currFrameTime += dT;
+        if (this.currFrameTime > this.frameInterval) {
+            this.currFrameTime -= this.frameInterval;
+
+            this.xFrame++;
+            if (this.xFrame > this.numXFrames - 1) {
+                this.xFrame = 0;
+            }
+        }
 
         // horizontal movement
         this.x += this.xSpeed;
@@ -63,11 +88,25 @@ class Player {
         else if (this.x >= this.gameWidth - this.width) {
             this.x = this.gameWidth - this.width;
         }
+
+        // vertical movement
+        this.y += this.ySpeed;
+        if (!this.onGround()) {
+            this.ySpeed += this.weight;
+        }
+        else {
+            this.y = this.startingY;
+            this.ySpeed = 0;
+        }
     }
 
     setState(state) {
         this.currentState = this.states[state];
         this.currentState.enter();
+    }
+
+    onGround() {
+        return this.y >= this.gameHeight - this.height;
     }
 }
 

@@ -21,7 +21,10 @@ window.addEventListener('load', () => {
     const animate = (timestamp) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        player.update(input.lastKey);
+        const dT = timestamp - lastTimestamp;
+        lastTimestamp = timestamp;
+
+        player.update(dT, input.lastKey);
         player.draw(ctx);
         drawStatusText(ctx, input, player);
 
@@ -65,5 +68,5 @@ window.addEventListener('load', () => {
     // player.draw(ctx);
 
     const input = new InputHandler();
-    animate();
+    animate(0);
 });
