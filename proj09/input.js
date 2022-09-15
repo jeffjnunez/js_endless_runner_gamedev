@@ -11,8 +11,6 @@ export class InputHandler {
         ];
 
         window.addEventListener('keydown', e => {
-            console.log(e.key, this.keys);
-            console.log(e);
             if (this.keysToRegister.includes(e.key) && !this.keys.includes(e.key)) {
                 this.keys.push(e.key);
             }
@@ -22,7 +20,6 @@ export class InputHandler {
             if (this.keysToRegister.includes(e.key)) {
                 this.keys.splice(this.keys.indexOf(e.key), 1);
             }
-            console.log(e.key, this.keys);
         });
     }
 }

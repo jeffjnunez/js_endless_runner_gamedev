@@ -11,17 +11,50 @@ export class Player {
         this.spriteHeight = this.height;
         this.xFrame = 0;
         this.yFrame = 0;
+        this.xSpeed = 0;
+        this.xMaxSpeed = 10;
+        this.ySpeed = 0;
+        this.yJumpImpulse = -28;
+        this.weight = 1;
+        this.xStart = 100;
+        this.yStart = this.game.height - this.height;
         this.x = 0;
-        this.y = this.game.height - this.height;
+        this.y = this.yStart;
     }
 
     update(inputKeys) {
+        // horizontal movement
         if (inputKeys.includes('ArrowRight') && !inputKeys.includes('ArrowLeft')) {
-            this.x++;
+            this.xSpeed = this.xMaxSpeed;
         }
         else if (inputKeys.includes('ArrowLeft') && !inputKeys.includes('ArrowRight')) {
-            this.x--;
+            this.xSpeed = -this.xMaxSpeed;
         }
+        else {
+            this.xSpeed = 0;
+        }
+        this.x += this.xSpeed;
+
+        //horizontal boundaries
+        if (this.x < 0) {
+            this.x = 0;
+        }
+        else if (this.x > this.game.width - this.width) {
+            this.x = this.game.width - this.width;
+        }
+
+        // vertical movement (jump and dive)
+        if (inputKeys.includes('ArrowUp') && this.onGround()) {
+            this.ySpeed = this.yJumpImpulse;
+        }
+        else if (!this.onGround()) {
+            this.ySpeed += this.weight;
+        }
+        else {
+            this.y = this.yStart;
+            this.ySpeed = 0;
+        }
+        this.y += this.ySpeed;
     }
 
     draw(context) {
@@ -43,5 +76,9 @@ export class Player {
             this.width,
             this.height
         );
+    }
+
+    onGround() {
+        return this.y >= this.game.height - this.height;
     }
 }
