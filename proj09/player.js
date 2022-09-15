@@ -1,3 +1,8 @@
+import {
+    Sitting,
+    Running
+} from "./playerStates.js";
+
 export class Player {
     constructor(game) {
         this.game = game;
@@ -9,6 +14,12 @@ export class Player {
         // separate spriteW/H properties, just in case that changes.
         this.spriteWidth = this.width;
         this.spriteHeight = this.height;
+        this.states = [
+            new Sitting(this),
+            new Running(this),
+        ];
+        this.currentState = this.states[0];
+        this.currentState.enter();
         this.xFrame = 0;
         this.yFrame = 0;
         this.xSpeed = 0;
@@ -23,6 +34,8 @@ export class Player {
     }
 
     update(inputKeys) {
+        this.currentState.handleInput(inputKeys);
+
         // horizontal movement
         if (inputKeys.includes('ArrowRight') && !inputKeys.includes('ArrowLeft')) {
             this.xSpeed = this.xMaxSpeed;
@@ -58,13 +71,6 @@ export class Player {
     }
 
     draw(context) {
-        context.fillStyle = 'red';
-        context.fillRect(
-            this.x,
-            this.y,
-            this.width,
-            this.height
-        );
         context.drawImage(
             this.image,
             this.xFrame * this.spriteWidth,
@@ -80,5 +86,10 @@ export class Player {
 
     onGround() {
         return this.y >= this.game.height - this.height;
+    }
+
+    setState(stateIndex) {
+        this.currentState = this.states[stateIndex];
+        this.currentState.enter();
     }
 }
