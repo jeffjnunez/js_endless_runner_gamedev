@@ -1,6 +1,8 @@
 import {
     Sitting,
-    Running
+    Running,
+    Jumping,
+    Falling
 } from "./playerStates.js";
 
 export class Player {
@@ -17,11 +19,16 @@ export class Player {
         this.states = [
             new Sitting(this),
             new Running(this),
+            new Jumping(this),
+            new Falling(this),
         ];
         this.currentState = this.states[0];
         this.currentState.enter();
         this.xFrame = 0;
         this.yFrame = 0;
+        this.animFPS = 15;
+        this.frameInterval = 1000 / this.animFPS;
+        this.frameTime = 0;
         this.xSpeed = 0;
         this.xMaxSpeed = 10;
         this.ySpeed = 0;
@@ -33,7 +40,7 @@ export class Player {
         this.y = this.yStart;
     }
 
-    update(inputKeys) {
+    update(inputKeys, dT) {
         this.currentState.handleInput(inputKeys);
 
         // horizontal movement
@@ -56,18 +63,26 @@ export class Player {
             this.x = this.game.width - this.width;
         }
 
-        // vertical movement (jump and dive)
-        if (inputKeys.includes('ArrowUp') && this.onGround()) {
-            this.ySpeed = this.yJumpImpulse;
-        }
-        else if (!this.onGround()) {
+        // // vertical movement (jump and dive)
+        this.y += this.ySpeed;
+        if (!this.onGround()) {
             this.ySpeed += this.weight;
         }
         else {
             this.y = this.yStart;
             this.ySpeed = 0;
         }
-        this.y += this.ySpeed;
+
+        // sprite animation
+        this.frameTime += dT;
+        if (this.frameTime > this.frameInterval) {
+            this.frameTime -= this.frameInterval;
+
+            this.xFrame++;
+            if (this.xFrame > this.currentState.numFrames - 1) {
+                this.xFrame = 0;
+            }
+        }
     }
 
     draw(context) {

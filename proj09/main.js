@@ -17,8 +17,8 @@ window.addEventListener('load', () => {
             this.input = new InputHandler();
         }
 
-        update() {
-            this.player.update(this.input.keys);
+        update(dT) {
+            this.player.update(this.input.keys, dT);
         }
 
         draw(context) {
@@ -28,12 +28,15 @@ window.addEventListener('load', () => {
         }
     }
 
-    const animate = () => {
-        game.update();
+    let lastTimestamp = 0;
+    const animate = (timestamp) => {
+        let dT = timestamp - lastTimestamp;
+        lastTimestamp = timestamp;
+        game.update(dT);
         game.draw(ctx);
         requestAnimationFrame(animate);
     }
 
     const game = new Game(canvas.width, canvas.height);
-    animate();
+    animate(0);
 });
