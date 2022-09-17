@@ -15,6 +15,9 @@ class State {
     enter() {
         this.player.xFrame = 0;
         this.player.yFrame = this.yFrame;
+        if (undefined !== this.backgroundSpeed) {
+            this.player.game.backgroundSpeed = this.backgroundSpeed;
+        }
     }
 
     // handleInput(inputKeys) {
@@ -28,6 +31,7 @@ export class Sitting extends State {
 
         this.yFrame = 5;
         this.numFrames = 5;
+        this.backgroundSpeed = 0;
     }
 
     enter() {
@@ -47,6 +51,7 @@ export class Running extends State {
 
         this.yFrame = 3;
         this.numFrames = 9;
+        this.backgroundSpeed = 3;
     }
 
     enter() {

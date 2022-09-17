@@ -32,10 +32,10 @@ export class Player {
         this.xSpeed = 0;
         this.xMaxSpeed = 10;
         this.ySpeed = 0;
-        this.yJumpImpulse = -28;
+        this.yJumpImpulse = -27;
         this.weight = 1;
         this.xStart = 100;
-        this.yStart = this.game.height - this.height;
+        this.yStart = this.game.height - this.height - this.game.groundMargin;
         this.x = 0;
         this.y = this.yStart;
     }
@@ -100,7 +100,7 @@ export class Player {
     }
 
     onGround() {
-        return this.y >= this.game.height - this.height;
+        return this.y >= this.yStart;
     }
 
     setState(stateIndex) {
