@@ -41,7 +41,7 @@ window.addEventListener('load', () => {
 
         addEnemy() {
             this.enemies.push(new FlyingEnemy(this));
-            // console.log(this.enemies[0]);
+            // console.log(this.enemies);
         }
 
         updateEnemies(dT) {
@@ -52,8 +52,11 @@ window.addEventListener('load', () => {
                 this.addEnemy();
             }
 
-            this.enemies.forEach(enemy => {
+            this.enemies.forEach((enemy, idx) => {
                 enemy.update(dT);
+                if (enemy.markedForDeletion) {
+                    this.enemies.splice(idx, 1);
+                }
             });
         }
 
