@@ -51,7 +51,7 @@ export class Running extends State {
 
         this.yFrame = 3;
         this.numFrames = 9;
-        this.backgroundSpeed = 3;
+        this.backgroundSpeed = 0.3;
     }
 
     enter() {

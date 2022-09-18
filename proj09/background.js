@@ -9,12 +9,12 @@ class Layer {
         this.y = 0;
     }
 
-    update() {
+    update(dT) {
         if (this.x < -this.width) {
             this.x += this.width;
         }
         else {
-            this.x -= this.game.backgroundSpeed * this.speedModifier;
+            this.x -= this.game.backgroundSpeed * this.speedModifier * dT;
         }
     }
 
@@ -60,9 +60,9 @@ export class Background {
         ];
     }
 
-    update() {
+    update(dT) {
         this.backgroundLayers.forEach(layer => {
-            layer.update();
+            layer.update(dT);
         });
     }
 
