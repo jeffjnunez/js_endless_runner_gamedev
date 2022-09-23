@@ -2,7 +2,10 @@ const states = {
     SITTING: 0,
     RUNNING: 1,
     JUMPING: 2,
-    FALLING: 3
+    FALLING: 3,
+    ROLLING: 4,
+    DIVING:  5,
+    HIT:     6
 };
 
 class State {
@@ -42,6 +45,12 @@ export class Sitting extends State {
         if (inputKeys.includes('ArrowLeft') || inputKeys.includes('ArrowRight')) {
             this.player.setState(states.RUNNING);
         }
+        else if (inputKeys.includes('Enter')) {
+            this.player.setState(states.ROLLING);
+        }
+        else if (inputKeys.includes('ArrowUp')) {
+            this.player.setState(states.RUNNING);
+        }
     }
 }
 
@@ -64,6 +73,9 @@ export class Running extends State {
         }
         else if (inputKeys.includes('ArrowDown')) {
             this.player.setState(states.SITTING);
+        }
+        else if (inputKeys.includes('Enter')) {
+            this.player.setState(states.ROLLING);
         }
     }
 }
@@ -89,6 +101,9 @@ export class Jumping extends State {
         if (this.player.ySpeed > 0) {
             this.player.setState(states.FALLING);
         }
+        else if (inputKeys.includes('Enter')) {
+            this.player.setState(states.ROLLING);
+        }
     }
 }
 
@@ -112,6 +127,41 @@ export class Falling extends State {
     handleInput(inputKeys) {
         if (this.player.onGround()) {
             this.player.setState(states.RUNNING);
+        }
+    }
+}
+
+export class Rolling extends State {
+    constructor(player) {
+        super('ROLLING', player);
+
+        this.yFrame = 6;
+        this.numFrames = 7;
+        this.backgroundSpeed = 0.6;
+    }
+
+    enter() {
+        super.enter();
+
+        // vertical movement (jump and dive)
+        if (this.player.onGround()) {
+            this.player.ySpeed = this.player.yJumpImpulse;
+        }
+    }
+
+    handleInput(inputKeys) {
+        if (!inputKeys.includes('Enter')) {
+            if (this.player.onGround()) {
+                this.player.setState(states.RUNNING);
+            }
+            else {
+                this.player.setState(states.FALLING);
+            }
+        }
+        else {
+            if (inputKeys.includes('ArrowUp') && this.player.onGround()) {
+                this.player.ySpeed = this.player.yJumpImpulse;
+            }
         }
     }
 }
