@@ -1,3 +1,5 @@
+import { Dust } from './particles.js';
+
 const states = {
     SITTING: 0,
     RUNNING: 1,
@@ -68,6 +70,12 @@ export class Running extends State {
     }
 
     handleInput(inputKeys) {
+        this.player.game.particles.push(new Dust(
+            this.player.game,
+            this.player.x + this.player.width / 3,
+            this.player.y + this.player.height * 0.95
+        ));
+
         if (inputKeys.includes('ArrowUp')) {
             this.player.setState(states.JUMPING);
         }

@@ -23,6 +23,7 @@ window.addEventListener('load', () => {
             this.input = new InputHandler(this);
             this.UI = new UI(this);
             this.enemies = [];
+            this.particles = [];
             this.enemyTimer = 0;
             this.enemyInterval = 1000;
             this.score = 0;
@@ -34,6 +35,7 @@ window.addEventListener('load', () => {
             this.background.update(dT);
             this.player.update(this.input.keys, dT);
             this.updateEnemies(dT);
+            this.updateParticles(dT);
         }
 
         draw(context) {
@@ -42,6 +44,7 @@ window.addEventListener('load', () => {
             this.background.draw(context);
             this.player.draw(context);
             this.drawEnemies(context);
+            this.drawParticles(context);
             this.UI.draw(context);
         }
 
@@ -57,6 +60,7 @@ window.addEventListener('load', () => {
             this.enemies.push(new FlyingEnemy(this));
 
 
+            // console.log(this.particles);
             // console.log(this.enemies);
             // if (this.enemies.length) {
                 // console.log(this.enemies[0].x);
@@ -82,6 +86,21 @@ window.addEventListener('load', () => {
         drawEnemies(context) {
             this.enemies.forEach(enemy => {
                 enemy.draw(context);
+            });
+        }
+
+        updateParticles(dT) {
+            this.particles.forEach((particle, idx) => {
+                particle.update(dT);
+                if (particle.markedForDeletion) {
+                    this.particles.splice(idx, 1);
+                }
+            });
+        }
+
+        drawParticles(context) {
+            this.particles.forEach(particle => {
+                particle.draw(context);
             });
         }
     }
