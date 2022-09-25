@@ -69,12 +69,25 @@ export class Running extends State {
         super.enter();
     }
 
-    handleInput(inputKeys) {
+    spawnParticle() {
+        if (this.player.xFrame !== 3 && this.player.xFrame !== 6) {
+            return;
+        }
+
+        // Only spawn particles during specific frames of the Running anim cycle.
+        // When front feet make contact with ground, spawn near front feet.
+        // When back feet make contact with ground, spawn near back feet.
         this.player.game.particles.push(new Dust(
             this.player.game,
-            this.player.x + this.player.width / 3,
+            this.player.xFrame === 3
+             ? this.player.x + this.player.width * 2 / 3
+             : this.player.x + this.player.width / 3,
             this.player.y + this.player.height * 0.95
         ));
+    }
+
+    handleInput(inputKeys) {
+        this.spawnParticle();
 
         if (inputKeys.includes('ArrowUp')) {
             this.player.setState(states.JUMPING);
