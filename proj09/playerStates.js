@@ -1,4 +1,4 @@
-import { Dust } from './particles.js';
+import { Dust, Fire } from './particles.js';
 
 const states = {
     SITTING: 0,
@@ -69,7 +69,7 @@ export class Running extends State {
         super.enter();
     }
 
-    spawnParticle() {
+    spawnDustParticle() {
         if (this.player.xFrame !== 3 && this.player.xFrame !== 6) {
             return;
         }
@@ -87,7 +87,7 @@ export class Running extends State {
     }
 
     handleInput(inputKeys) {
-        this.spawnParticle();
+        this.spawnDustParticle();
 
         if (inputKeys.includes('ArrowUp')) {
             this.player.setState(states.JUMPING);
@@ -170,7 +170,17 @@ export class Rolling extends State {
         }
     }
 
+    spawnFireParticle() {
+        this.player.game.particles.push(new Fire(
+            this.player.game,
+            this.player.x + this.player.width * 0.2,
+            this.player.y + this.player.height * 0.3
+        ));
+    }
+
     handleInput(inputKeys) {
+        this.spawnFireParticle();
+
         if (!inputKeys.includes('Enter')) {
             if (this.player.onGround()) {
                 this.player.setState(states.RUNNING);

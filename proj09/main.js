@@ -58,13 +58,6 @@ window.addEventListener('load', () => {
             }
 
             this.enemies.push(new FlyingEnemy(this));
-
-
-            // console.log(this.particles);
-            // console.log(this.enemies);
-            // if (this.enemies.length) {
-                // console.log(this.enemies[0].x);
-            // }
         }
 
         updateEnemies(dT) {
@@ -99,9 +92,11 @@ window.addEventListener('load', () => {
         }
 
         drawParticles(context) {
+            // context.save();
             this.particles.forEach(particle => {
                 particle.draw(context);
             });
+            // context.restore();
         }
     }
 
