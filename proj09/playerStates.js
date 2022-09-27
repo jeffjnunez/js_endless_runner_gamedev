@@ -1,4 +1,4 @@
-import { Dust, Fire } from './particles.js';
+import { Dust, Fire, Splash } from './particles.js';
 
 const states = {
     SITTING: 0,
@@ -122,6 +122,9 @@ export class Jumping extends State {
         if (this.player.ySpeed > 0) {
             this.player.setState(states.FALLING);
         }
+        else if (inputKeys.includes('ArrowDown')) {
+            this.player.setState(states.DIVING);
+        }
         else if (inputKeys.includes('Enter')) {
             this.player.setState(states.ROLLING);
         }
@@ -148,6 +151,9 @@ export class Falling extends State {
     handleInput(inputKeys) {
         if (this.player.onGround()) {
             this.player.setState(states.RUNNING);
+        }
+        else if (inputKeys.includes('ArrowDown')) {
+            this.player.setState(states.DIVING);
         }
     }
 }
@@ -181,7 +187,10 @@ export class Rolling extends State {
     handleInput(inputKeys) {
         this.spawnFireParticle();
 
-        if (!inputKeys.includes('Enter')) {
+        if (inputKeys.includes('ArrowDown') && this.player.onGround()) {
+            this.player.setState(states.DIVING);
+        }
+        else if (!inputKeys.includes('Enter')) {
             if (this.player.onGround()) {
                 this.player.setState(states.RUNNING);
             }
@@ -194,5 +203,57 @@ export class Rolling extends State {
                 this.player.ySpeed = this.player.yJumpImpulse;
             }
         }
+    }
+}
+
+export class Diving extends State {
+    constructor(player) {
+        super('DIVING', player);
+
+        // Diving uses same sprites as Rolling
+        this.yFrame = 6;
+        this.numFrames = 7;
+        this.backgroundSpeed = 0;
+    }
+
+    enter() {
+        super.enter();
+
+        // diving impulse to make "smashing into ground" feel better
+        this.player.ySpeed = Math.max(this.player.ySpeed, this.player.yDiveImpulse);
+    }
+
+    spawnFireParticle() {
+        this.player.game.particles.push(new Fire(
+            this.player.game,
+            this.player.x + this.player.width * 0.2,
+            this.player.y + this.player.height * 0.3
+        ));
+    }
+
+    spawnSplashParticles() {
+        const numSplashParticles = 30;
+
+        for (let i = 0; i < numSplashParticles; i++) {
+            this.player.game.particles.push(new Splash(
+                this.player.game,
+                this.player.x + this.player.width * 0.2,
+                this.player.y + this.player.height * 0.5
+            ));
+        }
+    }
+
+    handleInput(inputKeys) {
+        this.spawnFireParticle();
+
+        if (inputKeys.includes('Enter') && this.player.onGround()) {
+            this.player.setState(states.ROLLING);
+            this.spawnSplashParticles();
+        }
+        else if (this.player.onGround()) {
+            this.player.setState(states.RUNNING);
+            this.spawnSplashParticles();
+        }
+
     }
 }

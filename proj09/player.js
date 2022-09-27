@@ -3,8 +3,8 @@ import {
     Running,
     Jumping,
     Falling,
-    Rolling
-    // Diving,
+    Rolling,
+    Diving,
     // Hit
 } from "./playerStates.js";
 
@@ -25,6 +25,7 @@ export class Player {
             new Jumping(this),
             new Falling(this),
             new Rolling(this),
+            new Diving(this),
         ];
         this.currentState = this.states[0];
         this.currentState.enter();
@@ -37,6 +38,7 @@ export class Player {
         this.xMaxSpeed = 10;
         this.ySpeed = 0;
         this.yJumpImpulse = -27;
+        this.yDiveImpulse = 15;
         this.weight = 1;
         this.xStart = 100;
         this.yStart = this.game.height - this.height - this.game.groundMargin;
