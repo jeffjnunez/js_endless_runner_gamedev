@@ -16,7 +16,7 @@ window.addEventListener('load', () => {
         constructor(width, height) {
             this.width = width;
             this.height = height;
-            this.groundMargin = 84;
+            this.groundMargin = 50;
             this.backgroundSpeed = 0.3;
             this.background = new Background(this);
             this.player = new Player(this);
@@ -29,10 +29,19 @@ window.addEventListener('load', () => {
             this.enemyInterval = 1000;
             this.score = 0;
             this.fontColor = 'black';
-            this.debug = true;
+            this.debug = false;
+            this.time = 0;
+            this.maxTime = 10000;
+            this.gameOver = false;
+            this.victory = false;
         }
 
         update(dT) {
+            this.time += dT;
+            if (this.time > this.maxTime) {
+                this.gameOver = true;
+                this.setVictory();
+            }
             this.background.update(dT);
             this.player.update(this.input.keys, dT);
             this.updateEnemies(dT);
@@ -116,6 +125,10 @@ window.addEventListener('load', () => {
                 collisionAnim.draw(context);
             });
         }
+
+        setVictory() {
+            this.victory = this.score > 5;
+        }
     }
 
     let lastTimestamp = 0;
@@ -124,7 +137,10 @@ window.addEventListener('load', () => {
         lastTimestamp = timestamp;
         game.update(dT);
         game.draw(ctx);
-        requestAnimationFrame(animate);
+
+        if (!game.gameOver) {
+            requestAnimationFrame(animate);
+        }
     }
 
     const game = new Game(canvas.width, canvas.height);
