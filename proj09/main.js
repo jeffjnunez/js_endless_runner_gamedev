@@ -24,6 +24,7 @@ window.addEventListener('load', () => {
             this.UI = new UI(this);
             this.enemies = [];
             this.particles = [];
+            this.collisionAnims = [];
             this.enemyTimer = 0;
             this.enemyInterval = 1000;
             this.score = 0;
@@ -36,6 +37,7 @@ window.addEventListener('load', () => {
             this.player.update(this.input.keys, dT);
             this.updateEnemies(dT);
             this.updateParticles(dT);
+            this.updateCollisionAnims(dT);
         }
 
         draw(context) {
@@ -45,6 +47,7 @@ window.addEventListener('load', () => {
             this.player.draw(context);
             this.drawEnemies(context);
             this.drawParticles(context);
+            this.drawCollisionAnims(context);
             this.UI.draw(context);
         }
 
@@ -97,6 +100,21 @@ window.addEventListener('load', () => {
                 particle.draw(context);
             });
             // context.restore();
+        }
+
+        updateCollisionAnims(dT) {
+            this.collisionAnims.forEach((collisionAnim, idx) => {
+                collisionAnim.update(dT);
+                if (collisionAnim.markedForDeletion) {
+                    this.collisionAnims.splice(idx, 1);
+                }
+            });
+        }
+
+        drawCollisionAnims(context) {
+            this.collisionAnims.forEach(collisionAnim => {
+                collisionAnim.draw(context);
+            });
         }
     }
 

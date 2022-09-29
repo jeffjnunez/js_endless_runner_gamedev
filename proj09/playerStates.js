@@ -1,6 +1,6 @@
 import { Dust, Fire, Splash } from './particles.js';
 
-const states = {
+export const states = {
     SITTING: 0,
     RUNNING: 1,
     JUMPING: 2,
@@ -255,5 +255,46 @@ export class Diving extends State {
             this.spawnSplashParticles();
         }
 
+    }
+}
+
+export class Hit extends State {
+    constructor(player) {
+        super('HIT', player);
+
+        this.yFrame = 4;
+        this.numFrames = 11;
+        this.backgroundSpeed = 0;
+        // this.numLoops = 7;
+        // this.currLoops = 0;
+    }
+
+    enter() {
+        super.enter();
+
+        // diving impulse to make "smashing into ground" feel better
+        this.player.ySpeed = Math.max(this.player.ySpeed, this.player.yDiveImpulse);
+    }
+
+    handleInput(inputKeys) {
+        // if (this.player.xFrame >= this.numFrames - 1) {
+            // this.currLoops++;
+            // console.log(this.currLoops);
+        // }
+
+        // if (this.currLoops === this.numLoops) {
+        if (this.player.xFrame >= this.numFrames - 1) {
+            this.currLoops = 0;
+
+            if (this.player.onGround()) {
+                this.player.setState(states.RUNNING);
+            }
+            else {
+                this.player.setState(states.FALLING);
+            }
+        }
+        else {
+
+        }
     }
 }
